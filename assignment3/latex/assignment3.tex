@@ -145,12 +145,61 @@ The stochastic logistic regression program as described in \cite[pp. 702--705]{a
 
 We could not, or at least not without confusing tweaking of parameters, get a gradient descent algorithm to converge to a solution. The stochastic descent algorithm described above, however, worked. The convergence criteria we used was the average of the gradient every epoch.
 
-\subsection{Experimenting with popular tools: \texttt{Keras}, \texttt{PyTorch}, \texttt{scikit\_learn}}
+\section{Experimenting with popular tools}
+Three ready-to-run notebooks are provided in the assignment to demonstrate how three popular tools for machine learning can be used for the Salammbô exercise: Scikit-learn, Keras, and PyTorch. The authors have studied and executed the notebooks, but not spent time on exploring these tools in any depth. It is clear that they provide extensive and powerful high-level abstractions for machine learning algorithms.
 
-\subsection{Reading Ruder}
-You will read the article An overview of gradient descent optimization algorithms by Ruder (2017) and you will outline the main characteristics of all the optimization algorithms the author describes. This part should be of about one to two pages. 
-\cite{DBLP:journals/corr/Ruder16}
+\subsection{\texttt{Scikit\_learn}}
+\texttt{Scikit\_learn} includes fitting and prediction functions similiar to those implemented in the assignment. 
 
+\subsection{\texttt{Keras}}
+\texttt{Keras} is a high-level neural networks API, written in Python and capable of running on top of TensorFlow, CNTK, or Theano. It allows for easy and fast prototyping. The authors have not used \texttt{Keras} before, but it appears to be a powerful tool for deep learning.
+
+\subsection{\texttt{PyTorch}}
+\texttt{PyTorch} is an open source machine learning library based on the Torch library. It is used for applications such as natural language processing. The authors have not used \texttt{PyTorch} before, but it appears to be a powerful tool for deep learning.
+
+
+
+\section{Reading Ruder}
+
+In this section, we summarize and discuss the article by Ruder~\cite{ruder_overview_2016} on optimization techniques for gradient descent.
+A main take-away is that most descent optimization algorithms or tweaks seem to be experimentally verified more than analytically derived, i.e an author has tried a tweak that on some general level seems understandable even for a beginner.
+
+The mathematical notation in the article is somewhat of barrier for the beginner in the field. 
+
+The \emph{vanilla} gradient descent appears to be appropriate for smaller datasets, although what smaller specifically means is not known by the authors of this report
+The main advantage appears to be that approach is guaranteed to converge.
+However, we did not see this on the Salammbô data.   
+
+The article summarizes the challenges in Gradient Descent Optimization (GDO), irrespective of using \emph{vanilla GD}, \emph{SGD} or a mini-batch variant of GD, with
+\begin{itemize}
+    \item How to choose an appropriate learning rate and and possibly modifying it over time
+    \item  How to escape saddle points and local minima
+    \item  How to handle sparse data
+\end{itemize}
+
+Some specific comments on the algorithms follow below.
+
+\subsection{Momentum}
+Accelerates convergence by adding a fraction of the previous update to the current one.
+Ruder claims that this helps overcome local minima and accelerates progress along consistent directions. This optimization approach also appears to be easy to implement.
+A couple of lines of code in the AI-lab notebook would have sufficed.
+
+\subsection{Nesterov Accelerated Gradient (NAG)}
+A smarter version of momentum with a \emph{look ahead}, i.e partly \emph{skating to where the puck/parameters will be}. See \verb|https://www.cs.toronto.edu/~hinton/coursera/lecture6/lec6.pdf| 
+This approach would also have been fairly simple to implement in the lab.
+
+\subsection{Adagrad}
+Adapts learning rates \emph{per-parameter} based on historical gradients.
+Ruder states that this works well for sparse data but can overly decrease learning rates over time
+
+
+\subsection{RMSprop}
+
+\subsection{Adam}
+
+\subsection{AdaMax}
+
+\subsection{Nadam}
 
 \section{Conclusions and future work}
 

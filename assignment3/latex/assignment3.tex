@@ -79,7 +79,7 @@ with sections and cells for each of the tasks in the assignment, and handed in t
 
 \subsection{Linear regression program using gradient descent}
 
-Linear regression with gradient descent in batch and stochastic variants as described in \cite[pp. 694--697]{aima} are implemented based on~\cite{nugues_lectures_2025} in the Jupyter notebook. The algorithms are applied on the provided word and letter 'a' counts from the 15 chapters of~\cite{flaubert1862salammbô} in French and English. The result is shown in Figure~\ref{fig:regression_English_French} with final weights  summarized in Table~\ref{tab:regression-table}, and with convergence speeds illustrated in Figure~\ref{fig:regression_errors}. 
+Linear regression with gradient descent in batch and stochastic variants as described in \cite[pp. 694--697]{aima} are implemented based on~\cite{nugues_lectures_2025} in the Jupyter notebook. The algorithms are applied on the provided word and letter 'a' counts from the 15 chapters of~\cite{flaubert1862salammbô} in French and English. The result is shown in Figure~\ref{fig:regression_English_French} with final weights  summarized in Table~\ref{tab:regression-table}, and with convergence speeds illustrated in Figure~\ref{fig:regression_errors}.  For this small multi-variable data set the result could also be verified by comparing with an exact solution from the normal equation\cite[Equation (19.7)]{aima}
 \begin{figure}
     \centering
     \includegraphics[width=0.45\textwidth]{figures/Fit English.png}
@@ -161,48 +161,59 @@ Three ready-to-run notebooks are provided in the assignment to demonstrate how t
 
 \section{Reading Ruder}
 
-In this section, we summarize and discuss the article by Ruder~\cite{ruder_overview_2016} on optimization techniques for gradient descent.
+In this section, we summarize and discuss the article by Ruder~\cite{DBLP:journals/corr/Ruder16} on optimization techniques for gradient descent.
 A main take-away is that most descent optimization algorithms or tweaks seem to be experimentally verified more than analytically derived, i.e an author has tried a tweak that on some general level seems understandable even for a beginner.
 
-The mathematical notation in the article is somewhat of barrier for the beginner in the field. 
+% The mathematical notation in the article is somewhat of barrier for the beginner in the field. 
 
-The \emph{vanilla} gradient descent appears to be appropriate for smaller datasets, although what smaller specifically means is not known by the authors of this report
-The main advantage appears to be that approach is guaranteed to converge.
-However, we did not see this on the Salammbô data.   
+The vanilla \emph{batch gradient descent} is appropriate for smaller (fit-in-memory) datasets. The main advantage is that the approach is guaranteed to converge to a global minimum for convex problems (and local minimum for non-convex problems).\footnote{However, we did not see this for the perceptron fitting on the Salammbô data.} The \emph{stochastic gradient descent} (SGD) is more appropriate for larger datasets and online use as it works with one sample at a time, but may require more tuning of the learning rate. The \emph{mini-batch gradient descent} is a compromise between the two and works with a small set of samples at a time. However, a major challenge is the choice of learning rate to get acceptable convergence.
+  
 
-The article summarizes the challenges in Gradient Descent Optimization (GDO), irrespective of using \emph{vanilla GD}, \emph{SGD} or a mini-batch variant of GD, with
+The article summarizes the challenges in Gradient Descent Optimization (GDO), irrespective of using \emph{vanilla GD}, \emph{SGD} or a mini-batch variant of GD:
 \begin{itemize}
     \item How to choose an appropriate learning rate and and possibly modifying it over time
     \item  How to escape saddle points and local minima
     \item  How to handle sparse data
 \end{itemize}
 
-Some specific comments on the algorithms follow below.
+\subsection{Gradient descent algorithms}
+Some specific algorithms are discussed in the article, and we will briefly summarize them below. Ruder visualizes the performance of the algorithms by plotting their trajectories in the parameter space for a benchmark loss function, and concludes that adaptive learning rate methods provide best convergence. Overall, Ruder recommends Adam as a robust and efficient optimization algorithm, but remarks that many recent papers use vanilla SGD with simple learning rate adjustments.
 
-\subsection{Momentum}
+\subsubsection{Momentum}
 Accelerates convergence by adding a fraction of the previous update to the current one.
 Ruder claims that this helps overcome local minima and accelerates progress along consistent directions. This optimization approach also appears to be easy to implement.
 A couple of lines of code in the AI-lab notebook would have sufficed.
 
-\subsection{Nesterov Accelerated Gradient (NAG)}
-A smarter version of momentum with a \emph{look ahead}, i.e partly \emph{skating to where the puck/parameters will be}. See \verb|https://www.cs.toronto.edu/~hinton/coursera/lecture6/lec6.pdf| 
+\subsubsection{Nesterov Accelerated Gradient (NAG)}
+A smarter version of momentum with a \emph{look ahead}, i.e partly \emph{skating to where the puck/parameters will be}~\cite{hinton_slides_2012}. 
 This approach would also have been fairly simple to implement in the lab.
 
-\subsection{Adagrad}
-Adapts learning rates \emph{per-parameter} based on historical gradients.
-Ruder states that this works well for sparse data but can overly decrease learning rates over time
+\subsubsection{Adagrad and Adadelta}
+Adagrad adapts learning rates \emph{per-parameter} based on historical gradients. It eliminates the need to manually tune the learning rate, but accumulation in the denominator results in a ever decreasing learning rate which eventually stops further learning. Adadelta is an extension of Adagrad that seeks to reduce this problem by using a moving average instead of accumulation. Adadelta does not even need a default learning rate.
 
 
-\subsection{RMSprop}
+\subsubsection{RMSprop}
+RMSprop is an unpublished extension of Adagrad also aiming to reduce the learning rate decay by an exponential function. 
 
-\subsection{Adam}
+\subsubsection{Adam}
+Adam is a combination of RMSprop and momentum. It computes adaptive learning rates for each parameter and stores an exponentially decaying average of past squared gradients. It is computationally efficient and has been shown to work well in practice.
 
-\subsection{AdaMax}
+\subsubsection{AdaMax}
+AdaMax is a variant of Adam based on the infinity norm.
 
-\subsection{Nadam}
+\subsubsection{Nadam}
+Nadam is a variant of Adam based on Nesterov momentum. The paper elaborates on details of the update rule but does not clearly comment on the performance. 
+
+\subsection{Parallelization, distributed SGD and additional strategies}
+Ruder also discusses parallelization and distributed SGD, and lists and comments briefly on a number of implementations.
+
+Among common tricks to improve performance of SGD, Ruder also mentions shuffling of input data at each epoch to avoid bias, although in some cases (progressively harder problems) a carefully selected order may improve learning.
+Batch normalization is suggested to avoid slower training as a result of losing initial normalization over time.
+Early stopping by monitoring the validation error is suggested to save computation (and avoid overfitting).
+Adding noise to the gradients is suggested to avoid getting stuck in local minima.
 
 \section{Conclusions and future work}
-
+It is clear from this assignment that there is a vast body of theory and implementations in the machine learning domain, and that this course merely scrapes the surface. The course has equipped us with initial and basic understanding to explore further and dig deeper into the field, and to use the available tools and implementations.  
 
 \printbibliography
 \end{document}
